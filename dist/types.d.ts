@@ -1,5 +1,5 @@
-import * as react_jsx_runtime from 'react/jsx-runtime';
+import React from 'react';
 
-declare const App: () => react_jsx_runtime.JSX.Element;
+declare const App: React.FC;
 
 export { App as TeraRaidCalc };

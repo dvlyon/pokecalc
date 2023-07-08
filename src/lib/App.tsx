@@ -31,12 +31,12 @@ interface IPokemonV2Pokemon {
     name: string
 }
 
-const App = () => {
+const App: React.FC = () => {
     const [types, setTypes] = useState<IPokemonV2Type[]>([])
     const [type1, setType1] = useState(0)
     const [type2, setType2] = useState(0)
     const [teraType, setTeraType] = useState(0)
-    const [pkmnList, setPkmnList] = useState('')
+    const [pkmnList, setPkmnList] = useState<string[]>([])
 
     useEffect(() => {
         const getTypes = async () => {
@@ -110,7 +110,7 @@ const App = () => {
             })
 
             if (pokes.data) {
-                setPkmnList(pokes.data.pokemon_v2_pokemon.map(p => p.name).join(", "))
+                setPkmnList([types.find(t => t.id === lowList[0])?.name + ': ' + pokes.data.pokemon_v2_pokemon.map(p => p.name).join(", ")])
             }
         } else {
             let pairs: number[] = []
@@ -118,8 +118,8 @@ const App = () => {
 
             for (let i = 0; i < lowList.length - 1; i++) {
                 for (let j = i+1; j < lowList.length; j++) {
-                    pairs.push(i)
-                    pairs.push(j)
+                    pairs.push(lowList[i])
+                    pairs.push(lowList[j])
                 }
             }
 
@@ -127,7 +127,7 @@ const App = () => {
                 const { data: pokes } = await axios.post<IPokemonV2PokemonResponse>('https://beta.pokeapi.co/graphql/v1beta', {
                     query: `
                         query pokemonPokeAPIquery {
-                            pokemon_v2_pokemon(where: {pokemon_v2_pokemontypes: {pokemon_v2_type: {id: {_eq: ${lowList[0]}}}}, _and: {pokemon_v2_pokemontypes: {pokemon_v2_type: {id: {_eq: ${lowList[1]}}}}}}, order_by: {pokemon_v2_pokemonstats_aggregate: {sum: {base_stat: desc}}}) {
+                            pokemon_v2_pokemon(where: {pokemon_v2_pokemontypes: {pokemon_v2_type: {id: {_eq: ${pairs[0]}}}}, _and: {pokemon_v2_pokemontypes: {pokemon_v2_type: {id: {_eq: ${pairs[1]}}}}}}, order_by: {pokemon_v2_pokemonstats_aggregate: {sum: {base_stat: desc}}}) {
                                 name
                             }
                         }
@@ -135,13 +135,13 @@ const App = () => {
                 })
 
                 if (pokes.data) {
-                    list.push(pokes.data.pokemon_v2_pokemon.map(p => p.name).join(", "))
+                    list.push(types.find(t => t.id === pairs[0])?.name + ' + ' + types.find(t => t.id === pairs[1])?.name + ': ' + pokes.data.pokemon_v2_pokemon.map(p => p.name).join(", "))
                 }
 
                 pairs.splice(0, 2)
             }
 
-            setPkmnList(list.join(', '))
+            setPkmnList(list)
         }
     }
 
@@ -152,28 +152,29 @@ const App = () => {
                 Type 1:
                 <select value={type1} onChange={e => setType1(parseInt(e.target.value))}>
                     <option value={0}>None</option>
-                    {types.map(t => <option value={t.id}>{t.name}</option>)}
+                    {types.map(t => <option key={'type1-' + t.id} value={t.id}>{t.name}</option>)}
                 </select>
             </label>
             <label>
                 Type 2:
                 <select value={type2} onChange={e => setType2(parseInt(e.target.value))} disabled={!type1}>
                     <option value={0}>None</option>
-                    {types.map(t => <option value={t.id}>{t.name}</option>)}
+                    {types.map(t => <option key={'type2-' + t.id} value={t.id}>{t.name}</option>)}
                 </select>
             </label>
             <label>
                 Tera Type:
                 <select value={teraType} onChange={e => setTeraType(parseInt(e.target.value))}>
                     <option value={0}>None</option>
-                    {types.map(t => <option value={t.id}>{t.name}</option>)}
+                    {types.map(t => <option key={'teraType-' + t.id} value={t.id}>{t.name}</option>)}
                 </select>
             </label>
             <input type="button" value="Calculate" onClick={onClick} disabled={!type1} />
         </div>
-        <p>
-            { pkmnList && 'Recommended pkmn: ' } { pkmnList }
-        </p>
+        <div>
+            <h5>{ pkmnList.length > 0 && 'Recommended pkmn: ' }</h5>
+            { pkmnList.map(l => <p key={l.replaceAll(' ', '')}>{ l }</p>) }
+        </div>
     </div>
   )
 }
