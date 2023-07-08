@@ -1,6 +1,6 @@
 # Pokemon Calculation Tools for React
 
-A library of React components created using `create-react-app`.
+A library of React components created using `create-react-app` (moved to `vite`).
 
 ## Installation
 
