@@ -1,6 +1,6 @@
 {
   "name": "pokecalc",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "dependencies": {
     "axios": "^1.4.0",
     "styled-components": "^6.0.3"
