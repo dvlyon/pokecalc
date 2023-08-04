@@ -1,0 +1,7 @@
+{
+  "src/components/index.ts": {
+    "file": "pokecalc.umd.js",
+    "isEntry": true,
+    "src": "src/components/index.ts"
+  }
+}
